@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="018e64e6-24ee-45e7-84c3-5bc56e88fb01" doc:description="This mule application/project reads csv file from my local pc, transform it to json, and wrte it to our specified disk location.Since our Transform message doesn't return anything to our postman here, we use set paylod to return/to display what has been done so far like a string message('Data written to Disk') to our postman, lastly logger is used to print the log to our console." >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="readcsvandwritejsonFlow" doc:id="1ef56026-3303-4ec9-8819-1286a31cf22f" >
+		<http:listener doc:name="Listener" doc:id="5a076628-cfcf-428f-9ecb-a91f1ef850b8" config-ref="HTTP_Listener_config" path="write2disk"/>
+		<file:read doc:name="ReadCSV" doc:id="9c6b9da9-fae0-423e-8bf1-24745444c223" path="C:\Mulesoft\DataUsed\airports.csv" outputMimeType="application/csv"/>
+		<ee:transform doc:name="Transform Message" doc:id="a26eb05f-52eb-44c6-841b-e9feed218b15" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="WritetoJson" doc:id="03a726c5-5739-4c11-8404-65db678bb3e5" path="C:\Mulesoft\DataUsed\airports_from_localpc.json"/>
+		<set-payload value="Data Written to Disk" doc:name="Set Payload" doc:id="50bf78d6-e7a0-436e-a742-17e848b2e457" />
+		<logger level="INFO" doc:name="Logger" doc:id="a0979c78-2c42-4a60-9d65-646966025b70" message="Completed Successfully."/>
+	</flow>
+</mule>
